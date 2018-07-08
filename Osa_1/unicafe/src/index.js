@@ -17,9 +17,10 @@ const Button = ({ handleClick, text }) => (
 
 const Statistic = ({ text, value }) => {
   return (
-    <div>
-      <p>{text} {value}</p>
-    </div>
+    <tr>
+      <td>{text}</td>
+      <td>{value}</td>
+    </tr>
   )
 }
 
@@ -33,7 +34,7 @@ const Statistics = ({ state }) => {
       </div>
     )
   }
-  
+
   const mean = () => {
     let temp = (state.hyva - state.huono) / tot
     return (
@@ -41,14 +42,20 @@ const Statistics = ({ state }) => {
     )
   }
 
-  const positive = () => ((state.hyva/tot)*100).toFixed(2)
+  const positive = () => ((state.hyva / tot) * 100).toFixed(2)
   return (
     <div>
-      <Statistic text="Hyvä" value={state.hyva} />
-      <Statistic text="Neutraali" value={state.neutraali} />
-      <Statistic text="Huono" value={state.huono} />
-      <p>Keskiarvo {mean()}</p>
-      <p>Positiivisia {positive()}%</p>
+      <table>
+        <tbody>
+          <Statistic text="Hyvä" value={state.hyva} />
+          <Statistic text="Neutraali" value={state.neutraali} />
+          <Statistic text="Huono" value={state.huono} />
+          <Statistic text="Keskiarvo" value={mean()} />
+          <Statistic text="Positiivisia" value={positive()+" %"} />
+        </tbody>
+      </table>
+      {/* <p>Keskiarvo {mean()}</p>
+      <p>Positiivisia {positive()}%</p> */}
     </div>
   )
 }
@@ -63,17 +70,19 @@ class App extends React.Component {
     }
   }
 
-  clickHyva = () => this.setState({ hyva: this.state.hyva + 1 })
-  clickNeutraali = () => this.setState({ neutraali: this.state.neutraali + 1 })
-  clickHuono = () => this.setState({ huono: this.state.huono + 1 })
+  clickIncrement = (field) => {
+    return () => {
+      this.setState({ [field]: this.state[field] + 1 })
+    }
+  }
 
   render() {
     return (
       <div>
         <Header header="Anna palautetta" />
-        <Button handleClick={this.clickHyva} text="Hyvä" />
-        <Button handleClick={this.clickNeutraali} text="Neutraali" />
-        <Button handleClick={this.clickHuono} text="Huono" />
+        <Button handleClick={this.clickIncrement("hyva")} text="Hyvä" />
+        <Button handleClick={this.clickIncrement("neutraali")} text="Neutraali" />
+        <Button handleClick={this.clickIncrement("huono")} text="Huono" />
         <Header header="Statistiikka" />
         <Statistics state={this.state} />
       </div>
