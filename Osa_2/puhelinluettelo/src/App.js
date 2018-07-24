@@ -44,10 +44,19 @@ class App extends React.Component {
 					})
 				})
 		} else {
-			this.setState({
-				newName: '',
-				newNumber: ''
-			})
+			if (window.confirm(newPerson.name + ' on jo luettelossa, korvataanko vanha numero?')) {
+				const personToChange = this.state.persons.find(p => p.name === newPerson.name)
+				const changedPerson = { ...personToChange, number: newPerson.number }
+				contactService
+					.update(changedPerson.id, changedPerson)
+					.then(response => {
+						this.setState({
+							persons: this.state.persons.map(p => p.name !== newPerson.name ? p : response),
+							newName: '',
+							newNumber: ''
+						})
+					})
+			}
 		}
 	}
 
@@ -61,6 +70,21 @@ class App extends React.Component {
 
 	handleFilterChange = (event) => {
 		this.setState({ filter: event.target.value })
+	}
+
+	handleDestroy = (id) => {
+		return () => {
+			console.log(id)
+			if (window.confirm('Oletko varma?')) {
+				contactService
+					.destroy(id)
+					.then(response => {
+						this.setState({
+							persons: this.state.persons.filter(person => person.id !== id)
+						})
+					})
+			}
+		}
 	}
 
 	render() {
@@ -89,7 +113,7 @@ class App extends React.Component {
 				/>
 				<div>
 					<h2>Numerot</h2>
-					<Contacts persons={contactsToShow} />
+					<Contacts persons={contactsToShow} handleDestroy={this.handleDestroy} />
 				</div>
 			</div>
 		)
