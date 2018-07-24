@@ -1,30 +1,28 @@
 import React from 'react';
 import Contacts from './components/Contacts'
 import NewContact from './components/NewContact'
+import contactService from './services/contacts'
+
 
 
 class App extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			persons: [
-				{
-					name: 'Arto Hellas',
-					number: '040-12345'
-				},
-				{
-					name: 'General Kenobi',
-					number: '040-456123'
-				},
-				{
-					name: 'Padavan Kenobi',
-					number: '040-456123'
-				}
-			],
+			persons: [],
 			newName: '',
 			newNumber: '',
 			filter: ''
 		}
+	}
+
+	componentDidMount() {
+		console.log('mount')
+		contactService
+			.getAll()
+			.then(response => {
+				this.setState({ persons: response })
+			})
 	}
 
 	addContact = (event) => {
@@ -35,17 +33,22 @@ class App extends React.Component {
 			number: this.state.newNumber
 		}
 
-		const persons =
-			this.state.persons.some(person => person.name === newPerson.name) ?
-				this.state.persons :
-				this.state.persons.concat(newPerson)
-
-
-		this.setState({
-			persons,
-			newName: '',
-			newNumber: ''
-		})
+		if (!this.state.persons.some(person => person.name === newPerson.name)) {
+			contactService
+				.create(newPerson)
+				.then(response => {
+					this.setState({
+						persons: this.state.persons.concat(response),
+						newName: '',
+						newNumber: ''
+					})
+				})
+		} else {
+			this.setState({
+				newName: '',
+				newNumber: ''
+			})
+		}
 	}
 
 	handleNameFieldChange = (event) => {
