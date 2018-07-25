@@ -1,6 +1,8 @@
 import React from 'react';
 import Contacts from './components/Contacts'
 import NewContact from './components/NewContact'
+import Notification from './components/Notification'
+
 import contactService from './services/contacts'
 
 
@@ -12,7 +14,8 @@ class App extends React.Component {
 			persons: [],
 			newName: '',
 			newNumber: '',
-			filter: ''
+			filter: '',
+			notification: null
 		}
 	}
 
@@ -40,8 +43,12 @@ class App extends React.Component {
 					this.setState({
 						persons: this.state.persons.concat(response),
 						newName: '',
-						newNumber: ''
+						newNumber: '',
+						notification: newPerson.name + ' lisättiin'
 					})
+					setTimeout(() => {
+						this.setState({ notification: null })
+					}, 5000)
 				})
 		} else {
 			if (window.confirm(newPerson.name + ' on jo luettelossa, korvataanko vanha numero?')) {
@@ -53,7 +60,18 @@ class App extends React.Component {
 						this.setState({
 							persons: this.state.persons.map(p => p.name !== newPerson.name ? p : response),
 							newName: '',
-							newNumber: ''
+							newNumber: '',
+							notification: 'Henkilön ' + newPerson.name + ' tiedot muutettiin'
+						})
+						setTimeout(() => {
+							this.setState({ notification: null })
+						}, 5000)
+					})
+					.catch(error => {
+						console.log('No person in database')
+						alert('Henkilö jonka tietoja olit muuttamassa on jo poistettu')
+						this.setState({
+							persons: this.state.persons.filter(p => p.name !== newPerson.name)
 						})
 					})
 			}
@@ -76,12 +94,17 @@ class App extends React.Component {
 		return () => {
 			console.log(id)
 			if (window.confirm('Oletko varma?')) {
+				const name = this.state.persons.find(person => person.id === id).name
 				contactService
 					.destroy(id)
 					.then(response => {
 						this.setState({
-							persons: this.state.persons.filter(person => person.id !== id)
+							persons: this.state.persons.filter(person => person.id !== id),
+							notification: name + ' poistettiin'
 						})
+						setTimeout(() => {
+							this.setState({ notification: null })
+						}, 5000)
 					})
 			}
 		}
@@ -105,6 +128,7 @@ class App extends React.Component {
 					/>
 				</div>
 				<h3>Lisää uusi</h3>
+				<Notification message={this.state.notification} />
 				<NewContact
 					state={this.state}
 					handleSubmit={this.addContact}
