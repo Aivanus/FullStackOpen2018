@@ -50,6 +50,9 @@ class App extends React.Component {
 						this.setState({ notification: null })
 					}, 5000)
 				})
+				.catch(error =>{
+					console.log(error.response.data.error)
+				})
 		} else {
 			if (window.confirm(newPerson.name + ' on jo luettelossa, korvataanko vanha numero?')) {
 				const personToChange = this.state.persons.find(p => p.name === newPerson.name)
