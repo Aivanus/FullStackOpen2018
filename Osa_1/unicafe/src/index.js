@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {createStore} from 'redux'
+import counterReducer from './reducer'
 
 const Header = (props) => {
   return (
@@ -26,7 +28,7 @@ const Statistic = ({ text, value }) => {
 
 const Statistics = ({ state }) => {
 
-  let tot = state.hyva + state.neutraali + state.huono
+  let tot = store.getState().good + store.getState().ok + store.getState().bad
   if (tot === 0) {
     return (
       <div>
@@ -36,43 +38,35 @@ const Statistics = ({ state }) => {
   }
 
   const mean = () => {
-    let temp = (state.hyva - state.huono) / tot
+    let temp = (store.getState().good - store.getState().bad) / tot
     return (
       temp.toFixed(2)
     )
   }
 
-  const positive = () => ((state.hyva / tot) * 100).toFixed(2)
+  const positive = () => ((store.getState().good / tot) * 100).toFixed(2)
   return (
     <div>
       <table>
         <tbody>
-          <Statistic text="Hyvä" value={state.hyva} />
-          <Statistic text="Neutraali" value={state.neutraali} />
-          <Statistic text="Huono" value={state.huono} />
+          <Statistic text="Hyvä" value={store.getState().good} />
+          <Statistic text="Neutraali" value={store.getState().ok} />
+          <Statistic text="Huono" value={store.getState().bad} />
           <Statistic text="Keskiarvo" value={mean()} />
           <Statistic text="Positiivisia" value={positive()+" %"} />
         </tbody>
       </table>
-      {/* <p>Keskiarvo {mean()}</p>
-      <p>Positiivisia {positive()}%</p> */}
     </div>
   )
 }
 
+const store = createStore(counterReducer)
+
 class App extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      hyva: 0,
-      neutraali: 0,
-      huono: 0
-    }
-  }
 
   clickIncrement = (field) => {
     return () => {
-      this.setState({ [field]: this.state[field] + 1 })
+      store.dispatch({type: field})
     }
   }
 
@@ -80,15 +74,20 @@ class App extends React.Component {
     return (
       <div>
         <Header header="Anna palautetta" />
-        <Button handleClick={this.clickIncrement("hyva")} text="Hyvä" />
-        <Button handleClick={this.clickIncrement("neutraali")} text="Neutraali" />
-        <Button handleClick={this.clickIncrement("huono")} text="Huono" />
+        <Button handleClick={this.clickIncrement("GOOD")} text="Hyvä" />
+        <Button handleClick={this.clickIncrement("OK")} text="Neutraali" />
+        <Button handleClick={this.clickIncrement("BAD")} text="Huono" />
         <Header header="Statistiikka" />
         <Statistics state={this.state} />
+        <Button handleClick={this.clickIncrement("ZERO")} text="Nollaa tilasto" />
       </div>
     )
   }
 }
 
+const renderApp = () => {
+  ReactDOM.render(<App />, document.getElementById('root'))
+}
 
-ReactDOM.render(<App />, document.getElementById('root'));
+renderApp()
+store.subscribe(renderApp)
