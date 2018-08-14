@@ -1,15 +1,12 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import Filter from './Filter'
 import { voting } from '../reducers/anecdoteReducer'
 import { setNotification, clearNotification } from '../reducers/notificationReducer'
-import { connect } from 'react-redux'
+import anecdoteService from '../services/anecdotes'
+
 
 class AnecdoteList extends React.Component {
-  handleClick = (anecdote) => () => {
-    this.props.voting(anecdote.id)
-    this.props.setNotification(`You voted ${anecdote.content}!`)
-  }
-
   render() {
     return (
       <div>
@@ -22,7 +19,8 @@ class AnecdoteList extends React.Component {
             </div>
             <div>
               has {anecdote.votes}
-              <button onClick={() => {
+              <button onClick={async () => {
+                await anecdoteService.update({ ...anecdote, votes: anecdote.votes + 1 })
                 this.props.voting(anecdote.id)
                 this.props.setNotification(`You voted ${anecdote.content}!`)
               }}>
