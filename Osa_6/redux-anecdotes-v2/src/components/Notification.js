@@ -4,11 +4,6 @@ import { setNotification, clearNotification } from '../reducers/notificationRedu
 
 class Notification extends React.Component {
   render() {
-    if (this.props.notification) {
-      setTimeout(() => {
-        this.props.clearNotification()
-      }, 5000)
-    }
     const style = {
       border: 'solid',
       padding: 10,
