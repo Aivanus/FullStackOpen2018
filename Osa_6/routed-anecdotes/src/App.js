@@ -1,47 +1,99 @@
 import React from 'react'
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Link, NavLink } from 'react-router-dom'
+import {
+  Container, Table, TableBody, TableRow, TableCell, Grid, Image, Menu as SemMenu,
+  GridColumn, Form, Button, FormField, Message, Header, Statistic, Segment
+} from 'semantic-ui-react'
 
 const Menu = () => (
-  <div>
-    <Link to="/">anecdotes</Link>&nbsp;
-    <Link to="/create">create new</Link>&nbsp;
-    <Link to="/about">about</Link>&nbsp;
-  </div>
+  <SemMenu inverted>
+    <SemMenu.Item link>
+      <NavLink exact to="/" activeStyle={activeMenuStyle}>anecdotes</NavLink>&nbsp;
+    </SemMenu.Item>
+    <SemMenu.Item link>
+      <NavLink exact to="/create" activeStyle={activeMenuStyle}>create new</NavLink>&nbsp;
+    </SemMenu.Item>
+    <SemMenu.Item link>
+      <NavLink exact to="/about" activeStyle={activeMenuStyle}> about</NavLink>&nbsp;
+    </SemMenu.Item>
+  </SemMenu>
 )
+
+// const Menu = () => (
+//   <div style={menuStyle}>
+//     <NavLink exact to="/" activeStyle={activeMenuStyle}>anecdotes</NavLink>&nbsp;
+//     <NavLink exact to="/create" activeStyle={activeMenuStyle}>create new</NavLink>&nbsp;
+//     <NavLink exact to="/about" activeStyle={activeMenuStyle}> about</NavLink>&nbsp;
+//   </div>
+// )
+
+const activeMenuStyle = {
+  fontWeight: 'bold',
+  color: 'lightblue',
+  backgroundColor: 'grey',
+  padding:15
+}
+
+const menuStyle = {
+  borderStyle: 'solid',
+  borderWidth: 2,
+  borderColor: 'purple',
+  backgroundColor: 'lightblue',
+  margin: 10,
+  fontSize: 22,
+  padding: 15
+}
 
 const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
-    <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >
-        <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
-      </li>)}
-    </ul>
+    <Table celled fixed singleLine>
+      <TableBody>
+        <ul>
+          {anecdotes.map(anecdote =>
+            <TableRow key={anecdote.id} >
+              <TableCell>
+                <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+              </TableCell>
+            </TableRow>)}
+        </ul>
+      </TableBody>
+    </Table>
   </div>
 )
+
 
 const Anecdote = ({ anecdote }) => {
   return (
     <div>
-      <h2>{anecdote.content} by {anecdote.author}</h2>
-      <div>Has {anecdote.votes} votes</div>
-      <div> For more info see <a href={anecdote.info}>{anecdote.info}</a></div>
+      <Header size='huge'>{anecdote.content}</Header>
+      <Header size='large'>by {anecdote.author}</Header>
+      <Statistic>
+        <Statistic.Label> Votes </Statistic.Label>
+        <Statistic.Value>{anecdote.votes}</Statistic.Value>
+      </Statistic>
+      <Segment> For more info see <a href={anecdote.info}>{anecdote.info}</a></Segment>
     </div>
   )
 }
 
 const About = () => (
-  <div>
-    <h2>About anecdote app</h2>
-    <p>According to Wikipedia:</p>
+  <Grid columns={2}>
+    <GridColumn>
+      <h2>About anecdote app</h2>
+      <p>According to Wikipedia:</p>
 
-    <em>An anecdote is a brief, revealing account of an individual person or an incident.
-      Occasionally humorous, anecdotes differ from jokes because their primary purpose is not simply to provoke laughter but to reveal a truth more general than the brief tale itself,
-      such as to characterize a person by delineating a specific quirk or trait, to communicate an abstract idea about a person, place, or thing through the concrete details of a short narrative.
+      <em>An anecdote is a brief, revealing account of an individual person or an incident.
+        Occasionally humorous, anecdotes differ from jokes because their primary purpose is not simply to provoke laughter but to reveal a truth more general than the brief tale itself,
+        such as to characterize a person by delineating a specific quirk or trait, to communicate an abstract idea about a person, place, or thing through the concrete details of a short narrative.
       An anecdote is "a story with a point."</em>
 
-    <p>Software engineering is full of excellent anecdotes, at this app you can find the best and add more.</p>
-  </div>
+      <p>Software engineering is full of excellent anecdotes, at this app you can find the best and add more.</p>
+    </GridColumn>
+    <GridColumn>
+      <Image src='https://upload.wikimedia.org/wikipedia/commons/2/23/Dennis_Ritchie_2011.jpg' />
+    </GridColumn>
+  </Grid>
 )
 
 const Footer = () => (
@@ -52,11 +104,22 @@ const Footer = () => (
   </div>
 )
 
+const notificationStyle = {
+  borderStyle: 'solid',
+  borderWidth: 3,
+  borderRadius: 10,
+  borderColor: 'green',
+  margin: 10,
+  color: 'green',
+  fontStyle: 'italic bold',
+  fontSize: 18
+}
+
 const Notification = ({ notification }) => {
   return (
-    <div>
-      <p>{notification}</p>
-    </div>
+    <Message success>
+      {notification}
+    </Message>
   )
 }
 
@@ -90,24 +153,23 @@ class CreateNew extends React.Component {
     return (
       <div>
         <h2>create a new anecdote</h2>
-        <form onSubmit={this.handleSubmit}>
-          <div>
-            content
+        <Form onSubmit={this.handleSubmit}>
+          <FormField>
+            <label>content</label>
             <input name='content' value={this.state.content} onChange={this.handleChange} />
-          </div>
-          <div>
-            author
+          </FormField>
+          <FormField>
+            <label>author</label>
             <input name='author' value={this.state.author} onChange={this.handleChange} />
-          </div>
-          <div>
-            url for more info
+          </FormField>
+          <FormField>
+            <label>url for more info</label>
             <input name='info' value={this.state.info} onChange={this.handleChange} />
-          </div>
-          <button>create</button>
-        </form>
+          </FormField>
+          <Button type='submit'>create</Button>
+        </Form>
       </div>
     )
-
   }
 }
 
@@ -163,20 +225,22 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
-        <h1>Software anecdotes</h1>
-        <Router>
-          <div>
-            <Menu />
-            {this.state.notification ? <Notification notification={this.state.notification} /> : null}
-            <Route exact path="/" render={() => <AnecdoteList anecdotes={this.state.anecdotes} />} />
-            <Route exact path="/anecdotes/:id" render={({ match }) => <Anecdote anecdote={this.anecdoteById(match.params.id)} />} />
-            <Route path="/create" render={({ history }) => <CreateNew addNew={this.addNew} history={history} />} />
-            <Route path="/about" render={() => <About />} />
-          </div>
-        </Router >
-        <Footer />
-      </div>
+      <Container>
+        <div>
+          <Header as='h1'>Software anecdotes</Header>
+          <Router>
+            <div>
+              <Menu />
+              {this.state.notification ? <Notification notification={this.state.notification} /> : null}
+              <Route exact path="/" render={() => <AnecdoteList anecdotes={this.state.anecdotes} />} />
+              <Route exact path="/anecdotes/:id" render={({ match }) => <Anecdote anecdote={this.anecdoteById(match.params.id)} />} />
+              <Route path="/create" render={({ history }) => <CreateNew addNew={this.addNew} history={history} />} />
+              <Route path="/about" render={() => <About />} />
+            </div>
+          </Router >
+          <Footer />
+        </div>
+      </Container>
     );
   }
 }
