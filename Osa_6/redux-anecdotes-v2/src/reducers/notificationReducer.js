@@ -1,8 +1,10 @@
 const reducer = (state = '', action) => {
   switch (action.type) {
     case 'SET':
+      console.log('set')
       return action.notification
     case 'CLEAR':
+      console.log('clear')
       return null
     default:
       return state
